@@ -10,6 +10,47 @@ clash_data_dir="/sdcard/Documents/clash"
 conf_file="${clash_data_dir}/config.yaml"
 geoip_file="${clash_data_dir}/Country.mmdb"
 pid_file="${clash_data_dir}/${bin_name}.pid"
+selector_file="${clash_data_dir}/selector.txt"
+selector_tmp="${clash_data_dir}/selector.tmp"
+
+
+get_ec_parameter() {
+     clash_ec_port=$(cat ${conf_file} | grep -E "^external-controller:" | head -n 1 | sed -E 's/external-controller: .*:([0-9]*).*/\1/')
+     clash_secret=$(cat ${conf_file} | grep -E "^secret:" | head -n 1 | sed -E 's/secret: "?([^"]*)"?.*/\1/')
+     if [ "${clash_ec_port}" = "" ] ; then
+         clash_ec_port="9090"
+     fi
+}
+
+selector_restore() {
+    if test -s ${selector_file} ; then
+        get_ec_parameter
+        va="0"
+        while read line ; do
+            if [ "$va" = "0" ] ; then
+                va="1"
+                group=$(echo $line |tr -d '\n' |od -An -tx1|tr ' ' %|tr -d '\n')
+            else
+                va="0"
+                selector=$line
+                curl -v -H "Authorization: Bearer ${clash_secret}" -X PUT -d "{${selector}}" "127.0.0.1:${clash_ec_port}/proxies/${group}"
+            fi
+        done < ${selector_file}
+    else
+        echo -e "\033[7;32mselector.txt empty or not exist, selector restore abortion\033[0m"
+    fi
+}
+
+selector_record() {
+    get_ec_parameter
+    curl -H "Authorization: Bearer ${clash_secret}" http://127.0.0.1:${clash_ec_port}/proxies | sed -E 's/Selector/Selector\n/g' | sed '$d' | sed -E 's/.*name":"(.*)","now":"(.*)","type.*/\1\n"name":"\2"/' > ${selector_tmp}
+    if test -s ${selector_tmp} ; then
+        cp -f ${selector_tmp} ${selector_file}
+    else
+        echo -e "\033[7;32mSelector empty, selector.txt not updated\033[0m"
+    fi
+    rm -f ${selector_tmp}
+}
 
 create_tun_link() {
     mkdir -p /dev/net
@@ -69,6 +110,7 @@ start_service() {
         if wait_clash_listen ; then
             add_rule
             add_route
+            selector_restore
             return 0
         else
             rm -f ${pid_file}
@@ -80,6 +122,7 @@ start_service() {
 }
 
 stop_service() {
+    selector_record
     kill -9 `cat ${pid_file}` || killall ${bin_name} || kill `cat ${pid_file}`
     sleep 1
     del_rule
