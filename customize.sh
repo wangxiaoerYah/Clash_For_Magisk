@@ -162,15 +162,19 @@ else
     abort "- Selection error."
 fi
 
-ui_print "- Start updating the module file"
-rm -rf $MODPATH/module.prop
-touch $MODPATH/module.prop
-echo "id=clash_premium" > $MODPATH/module.prop
-echo "name=Clash Premium For Magisk" >> $MODPATH/module.prop
-echo "version=${download_version}" >> $MODPATH/module.prop
-echo "versionCode=$(date +%Y%m%d)" >> $MODPATH/module.prop
-echo "author=shell scripts by kalasutra. clash premium by Dreamacro" >> $MODPATH/module.prop
-echo "description=clash premium with service scripts for Android.Only supports tun mode transparent proxy.Default disable ipv6." >> $MODPATH/module.prop
+if [ "${mod}" == "local" ] ; then
+    break
+elif [ "${mod}" == "online" ] ; then
+    ui_print "- Start updating the module file"
+    rm -rf $MODPATH/module.prop
+    touch $MODPATH/module.prop
+    echo "id=clash_premium" > $MODPATH/module.prop
+    echo "name=Clash Premium For Magisk" >> $MODPATH/module.prop
+    echo "version=${download_version}" >> $MODPATH/module.prop
+    echo "versionCode=$(date +%Y%m%d)" >> $MODPATH/module.prop
+    echo "author=shell scripts by kalasutra. clash premium by Dreamacro" >> $MODPATH/module.prop
+    echo "description=clash premium with service scripts for Android.Only supports tun mode transparent proxy.Default disable ipv6." >> $MODPATH/module.prop
+fi
 
 ui_print "- Start setting the necessary permissions."
 set_perm_recursive $MODPATH 0 0 0755 0644

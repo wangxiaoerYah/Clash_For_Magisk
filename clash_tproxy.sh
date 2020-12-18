@@ -59,6 +59,8 @@ create_proxy_iptables() {
             iptables -t mangle -A PROXY -m owner --uid-owner ${appid} -j CLASH
             iptables -t nat -A FILTER_DNS -m owner --uid-owner ${appid} -j DNS
         done
+    elif [ "${proxy_mode}" = "onlyproxy" ] ; then
+        break
     fi
 
     iptables -t mangle -A OUTPUT -j PROXY
@@ -74,6 +76,8 @@ probe_proxy_mode() {
             proxy_mode=ALL
         elif [ "${first_line}" = "bypass" ] ; then
             proxy_mode=skip
+        elif [ "${first_line}" = "onlyproxy" ] ; then
+            proxy_mode=onlyproxy
         else
             proxy_mode=pick
         fi
