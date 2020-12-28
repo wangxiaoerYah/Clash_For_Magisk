@@ -100,6 +100,9 @@ create_dns_iptables() {
     iptables -t nat -N DNS
     iptables -t nat -A DNS -p tcp --dport 53 -j REDIRECT --to-port ${clash_dns_port}
     iptables -t nat -A DNS -p udp --dport 53 -j REDIRECT --to-port ${clash_dns_port}
+    ip6tables -t nat -N DNS
+    ip6tables -t nat -A DNS -p tcp --dport 53 -j REDIRECT --to-port ${clash_dns_port}
+    ip6tables -t nat -A DNS -p udp --dport 53 -j REDIRECT --to-port ${clash_dns_port}
 }
 
 flush_iptables() {
@@ -120,6 +123,9 @@ flush_iptables() {
     iptables -t nat -X FILTER_DNS
     iptables -t nat -X DNS
     iptables -t nat -X AP_PROXY
+
+    ip6tables -t nat -F DNS
+    ip6tables -t nat -X DNS
 }
 
 disable_proxy() {

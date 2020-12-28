@@ -105,7 +105,7 @@ start_service() {
         chown root:sdcard_rw ${bin_path}
         chmod 6755 ${bin_path}
         create_tun_link
-        nohup ${bin_name} -d ${clash_data_dir} &
+        nohup ${bin_name} -d ${clash_data_dir} > /dev/null 2>&1 &
         echo -n $! > ${pid_file}
         if wait_clash_listen ; then
             add_rule
