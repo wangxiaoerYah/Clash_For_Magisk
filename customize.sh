@@ -40,12 +40,12 @@ while true ; do
         ui_print "- Vol + = stable"
         ui_print "- Vol - = canary"
         while true ; do
-           getevent -lc 1 2>&1 | grep KEY_VOLUME > $TMPDIR/events
-           if $(cat $TMPDIR/events | grep -q KEY_VOLUMEUP) ; then
+           getevent -lc 1 2>&1 | grep KEY_VOLUME > $TMPDIR/online
+           if $(cat $TMPDIR/online | grep -q KEY_VOLUMEUP) ; then
                version_status="stable"
                download_link="https://github.com/Dreamacro/clash/releases"
                break
-           elif $(cat $TMPDIR/events | grep -q KEY_VOLUMEDOWN) ; then
+           elif $(cat $TMPDIR/online | grep -q KEY_VOLUMEDOWN) ; then
                version_status="canary"
                download_link="https://tmpclashpremiumbindary.cf"
                break
