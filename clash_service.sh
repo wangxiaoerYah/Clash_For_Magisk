@@ -5,6 +5,7 @@ table_id="2020"
 tun_device="utun"
 tun_ip="198.18.0.0/16"
 bin_name="clash"
+ip="ip "
 bin_path="/system/bin/${bin_name}"
 clash_data_dir="/sdcard/Documents/clash"
 conf_file="${clash_data_dir}/config.yaml"
@@ -60,22 +61,22 @@ create_tun_link() {
 }
 
 add_rule() {
-    ip rule add fwmark ${mark_id} table ${table_id} pref 5000
-    ip rule add from ${tun_ip} to ${tun_ip} table ${table_id} pref 14000
+    ${ip} rule add fwmark ${mark_id} table ${table_id} pref 5000
+    ${ip} rule add from ${tun_ip} to ${tun_ip} table ${table_id} pref 14000
 }
 
 del_rule() {
-    ip rule del fwmark ${mark_id} table ${table_id} pref 5000
-    ip rule del from ${tun_ip} to ${tun_ip} table ${table_id} pref 14000
+    ${ip} rule del fwmark ${mark_id} table ${table_id} pref 5000
+    ${ip} rule del from ${tun_ip} to ${tun_ip} table ${table_id} pref 14000
 }
 
 add_route() {
-    ip route add default dev ${tun_device} table ${table_id}
-    ip route add ${tun_ip} dev ${tun_device} table ${table_id}
+    ${ip} route add default dev ${tun_device} table ${table_id}
+    ${ip} route add ${tun_ip} dev ${tun_device} table ${table_id}
 }
 
 flush_route() {
-    ip route flush table ${table_id}
+    ${ip} route flush table ${table_id}
 }
 
 wait_clash_listen() {
@@ -132,15 +133,15 @@ stop_service() {
 
 case "$1" in
     start)
-        start_service
+        start_service && ip="ip -6 " && tun_ip="fe80::7a30:9633:73bf:8eab/64" && add_rule && add_route
         ;;
     stop)
-        stop_service
+        stop_service && ip="ip -6 " && tun_ip="fe80::7a30:9633:73bf:8eab/64" && del_rule && flush_route
         ;;
     restart)
-        stop_service
+        stop_service && ip="ip -6 " && tun_ip="fe80::7a30:9633:73bf:8eab/64" && del_rule && flush_route
         sleep 1
-        start_service
+        start_service && ip="ip -6 " && tun_ip="fe80::7a30:9633:73bf:8eab/64" && add_rule && add_route
         ;;
     *)
         echo "$0: usage: $0 { start | stop | restart }"
