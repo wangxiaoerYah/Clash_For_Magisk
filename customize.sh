@@ -31,6 +31,7 @@ ui_print "- Vol Up = Local mod"
 ui_print "- Vol Down = Online mod"
 while true ; do
     getevent -lc 1 2>&1 | grep KEY_VOLUME > $TMPDIR/events
+    sleep 1
     if $(cat $TMPDIR/events | grep -q KEY_VOLUMEUP) ; then
         mod="local"
         break
@@ -39,13 +40,14 @@ while true ; do
         ui_print "- Please select a version."
         ui_print "- Vol + = stable"
         ui_print "- Vol - = canary"
+        sleep 1
         while true ; do
-           getevent -lc 1 2>&1 | grep KEY_VOLUME > $TMPDIR/online
-           if $(cat $TMPDIR/online | grep -q KEY_VOLUMEUP) ; then
+           getevent -lc 1 2>&1 | grep KEY_VOLUME > $TMPDIR/events
+           if $(cat $TMPDIR/events | grep -q KEY_VOLUMEUP) ; then
                version_status="stable"
                download_link="https://github.com/Dreamacro/clash/releases"
                break
-           elif $(cat $TMPDIR/online | grep -q KEY_VOLUMEDOWN) ; then
+           elif $(cat $TMPDIR/events | grep -q KEY_VOLUMEDOWN) ; then
                version_status="canary"
                download_link="https://tmpclashpremiumbindary.cf"
                break
