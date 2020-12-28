@@ -9,16 +9,18 @@ clash_redir_port="7892"
 clash_dns_port="1053"
 ip="iptables"
 tun_ip="198.18.0.0/16"
-intranet=(0.0.0.0/8 10.0.0.0/8 127.0.0.0/8 169.254.0.0/16 172.16.0.0/12 192.168.0.0/16 224.0.0.0/4 240.0.0.0/4)
+intranet=(0.0.0.0/8 10.0.0.0/8 100.64.0.0/10 127.0.0.0/8 169.254.0.0/16 172.16.0.0/12 192.0.0.0/24 192.0.2.0/24 192.88.99.0/24 192.168.0.0/16 198.18.0.0/15 198.51.100.0/24 203.0.113.0/24 224.0.0.0/4 240.0.0.0/4 255.255.255.255/32)
 
 create_mangle_iptables() {
     ${ip} -t mangle -N CLASH
 
-    if [ "${ip}" = "iptables" ] ; then
-        for subnet in ${intranet[@]} ; do
-            ${ip} -t mangle -A CLASH -d ${subnet} -j RETURN
-        done
+    if [ "${ip}" = "ip6tables" ] ; then
+        intranet=(::/128 ::1/128 ::ffff:0:0/96 100::/64 64:ff9b::/96 2001::/32 2001:10::/28 2001:20::/28 2001:db8::/32 2002::/16 fc00::/7 fe80::/10 ff00::/8)
     fi
+
+    for subnet in ${intranet[@]} ; do
+        ${ip} -t mangle -A CLASH -d ${subnet} -j RETURN
+    done
 
     ${ip} -t mangle -A CLASH -p tcp ! --dport 53 -j MARK --set-xmark ${mark_id}
     ${ip} -t mangle -A CLASH -p udp ! --dport 53 -j MARK --set-xmark ${mark_id}
