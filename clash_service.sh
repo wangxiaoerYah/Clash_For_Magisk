@@ -104,7 +104,7 @@ start_service() {
         exit 0
     elif [ -f ${conf_file} ] && [ -f ${geoip_file} ] && ${bin_name} -d ${clash_data_dir} -t ; then
         chown system:sdcard_rw ${bin_path}
-        chmod 6755 ${bin_path}
+        chmod 0755 ${bin_path}
         create_tun_link
         nohup ${bin_name} -d ${clash_data_dir} > /dev/null 2>&1 &
         echo -n $! > ${pid_file}
