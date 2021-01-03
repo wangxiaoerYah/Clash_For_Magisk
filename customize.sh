@@ -182,7 +182,7 @@ ui_print "- Start setting the necessary permissions."
 set_perm_recursive $MODPATH 0 0 0755 0644
 set_perm  $MODPATH/service.sh    0  0  0755
 set_perm  $MODPATH/uninstall.sh    0  0  0755
-set_perm  $MODPATH/system/bin/clash 1000 ${sdcard_rw_id} 6755
+set_perm  $MODPATH/system/bin/clash 0 ${sdcard_rw_id} 6755
 set_perm  $MODPATH/system/bin/clash_control 0 0 0755
 set_perm  $MODPATH/clash_service.sh 0 0 0755
 set_perm  $MODPATH/clash_tproxy.sh 0 0 0755
